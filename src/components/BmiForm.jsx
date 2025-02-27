@@ -11,11 +11,12 @@ const BmiForm = () => {
   const [selectedGender, setSelectedGender] = useState("");
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
-  const [height, setHeight] = useState(170);
-  const [weight, setWeight] = useState(65);
+  const [height, setHeight] = useState();
+  const [weight, setWeight] = useState();
   const [data, setData] = useState(null);
   const [bmi, setBmi] = useState(0);
   const [category, setCategory] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = () => {
     if (!name.trim()) {
@@ -23,8 +24,18 @@ const BmiForm = () => {
       return;
     }
 
-    if (!age.trim() || age < 0) {
-      alert("Umur harus diisi dengan angka yang valid");
+    if (height < 50 || height > 250) {
+      alert("Tinggi badan harus diantara 100 cm dan 250 cm");
+      return;
+    }
+
+    if (weight < 10 || weight > 300) {
+      alert("Berat badan harus diantara 10 kg dan 300 kg");
+      return;
+    }
+
+    if (age < 10) {
+      alert("Minimal umur adalah 10 tahun");
       return;
     }
 
@@ -32,42 +43,44 @@ const BmiForm = () => {
       alert("Pilih jenis kelamin terlebih dahulu");
       return;
     }
+    setIsLoading(true);
+    setTimeout(() => {
+      const bmiResult = (weight / (height / 100) ** 2).toFixed(1);
+      let kategori = "";
 
-    // Perhitungan BMI
-    const bmiResult = (weight / (height / 100) ** 2).toFixed(1);
-    let kategori = "";
+      if (bmiResult < 18.5) {
+        kategori = "Underweight";
+      } else if (bmiResult < 24.9) {
+        kategori = "Normal";
+      } else if (bmiResult < 29.9) {
+        kategori = "Overweight";
+      } else {
+        kategori = "Obese";
+      }
+      const currentDate = new Date().toLocaleDateString("id-ID", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      const userData = {
+        Nama: name.trim(),
+        Umur: age,
+        Gender: selectedGender,
+        Tinggi: height,
+        Berat: weight,
+        BMI: bmiResult,
+        Kategori: kategori,
+        Date: currentDate,
+      };
 
-    if (bmiResult < 18.5) {
-      kategori = "Underweight";
-    } else if (bmiResult < 24.9) {
-      kategori = "Normal";
-    } else if (bmiResult < 29.9) {
-      kategori = "Overweight";
-    } else {
-      kategori = "Obese";
-    }
-    const currentDate = new Date().toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-    const userData = {
-      Nama: name.trim(),
-      Umur: parseInt(age),
-      Gender: selectedGender,
-      Tinggi: parseInt(height),
-      Berat: parseInt(weight),
-      BMI: bmiResult,
-      Kategori: kategori,
-      Date: currentDate,
-    };
+      setData(userData);
 
-    setData(userData);
+      const history = JSON.parse(localStorage.getItem("bmiHistory")) || [];
+      history.push(userData);
 
-    const history = JSON.parse(localStorage.getItem("bmiHistory")) || [];
-    history.push(userData);
-
-    localStorage.setItem("bmiHistory", JSON.stringify(history));
+      localStorage.setItem("bmiHistory", JSON.stringify(history));
+      setIsLoading(false);
+    }, 1500);
   };
 
   return (
@@ -89,14 +102,28 @@ const BmiForm = () => {
           </div>
         </div>
 
-        <div className="container mb-5">
+        <div className="container mb-3">
           <div className="floating-input">
             <input type="number" className="" value={age} onChange={(e) => setAge(e.target.value)} placeholder="" />
             <label>Umur</label>
           </div>
         </div>
 
-        <div className="mb-3">
+        <div className="container mb-3">
+          <div className="floating-input">
+            <input type="number" className="" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="" />
+            <label>Tinggi (cm)</label>
+          </div>
+        </div>
+
+        <div className="container mb-3">
+          <div className="floating-input">
+            <input type="number" className="" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="" />
+            <label>Berat (kg)</label>
+          </div>
+        </div>
+
+        {/* <div className="mb-3">
           <label className="form-label">Tinggi Badan (cm)</label>
           <input type="range" min={100} max={300} className="form-range custom-range" value={height} onChange={(e) => setHeight(e.target.value)} />
           <div className="floating-input2 m-auto d-flex align-items-center justify-content-center">
@@ -122,13 +149,23 @@ const BmiForm = () => {
               {weight} kg
             </div>
           </div>
-        </div>
+        </div> */}
 
         <button className="btn btn-danger mt-3 px-4 py-2 fw-bold" onClick={handleSubmit}>
           Submit Data
         </button>
 
-        {data ? <BmiResult data={data} setBmi={setBmi} setCategory={setCategory} /> : <p className="mt-3 opacity-50">Hasil perhitungan akan muncul di sini</p>}
+        {isLoading ? (
+          <div className="d-flex justify-content-center mt-5 mb-5">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : data ? (
+          <BmiResult data={data} setBmi={setBmi} setCategory={setCategory} />
+        ) : (
+          <p className="mt-3 opacity-50">Hasil perhitungan akan muncul di sini</p>
+        )}
         <BmiHistory />
       </div>
     </div>
