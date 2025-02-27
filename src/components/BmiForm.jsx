@@ -29,7 +29,7 @@ const BmiForm = () => {
       return;
     }
 
-    if (weight < 10 || weight > 300) {
+    if (!weight || weight < 10 || weight > 300) {
       alert("Berat badan harus diantara 10 kg dan 300 kg");
       return;
     }
@@ -83,6 +83,20 @@ const BmiForm = () => {
     }, 1500);
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const formElements = Array.from(document.querySelectorAll("input"));
+      const currentIndex = formElements.indexOf(event.target);
+
+      if (currentIndex !== -1 && currentIndex < formElements.length - 1) {
+        formElements[currentIndex + 1].focus();
+      } else {
+        handleSubmit();
+      }
+    }
+  };
+
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light row">
       <div className="card p-4 text-center" style={{ width: "55rem" }}>
@@ -97,59 +111,31 @@ const BmiForm = () => {
 
         <div className="container mt-2 mb-3">
           <div className="floating-input">
-            <input type="text" className="" value={name} onChange={(e) => setName(e.target.value)} placeholder="" />
+            <input type="text" className="" value={name} onChange={(e) => setName(e.target.value)} placeholder="" onKeyDown={handleKeyDown} />
             <label>Nama</label>
           </div>
         </div>
 
         <div className="container mb-3">
           <div className="floating-input">
-            <input type="number" className="" value={age} onChange={(e) => setAge(e.target.value)} placeholder="" />
+            <input type="number" className="" value={age} onChange={(e) => setAge(e.target.value)} placeholder="" onKeyDown={handleKeyDown} />
             <label>Umur</label>
           </div>
         </div>
 
         <div className="container mb-3">
           <div className="floating-input">
-            <input type="number" className="" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="" />
+            <input type="number" className="" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="" onKeyDown={handleKeyDown} />
             <label>Tinggi (cm)</label>
           </div>
         </div>
 
         <div className="container mb-3">
           <div className="floating-input">
-            <input type="number" className="" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="" />
+            <input type="number" className="" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="" onKeyDown={handleKeyDown} />
             <label>Berat (kg)</label>
           </div>
         </div>
-
-        {/* <div className="mb-3">
-          <label className="form-label">Tinggi Badan (cm)</label>
-          <input type="range" min={100} max={300} className="form-range custom-range" value={height} onChange={(e) => setHeight(e.target.value)} />
-          <div className="floating-input2 m-auto d-flex align-items-center justify-content-center">
-            <input type="text" min={100} max={300} className="mt-2 text-center" value={height} onChange={(e) => setHeight(Math.max(100, Math.min(300, Number(e.target.value))))} />
-            <span className="fw-bold mt-2">cm</span>
-          </div>
-          <div className="progress custom-progress mt-2">
-            <div className="progress-bar custom-progress-bar bg-danger" style={{ width: `${(height / 300) * 100}%` }}>
-              {height} cm
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Berat Badan (kg)</label>
-          <input type="range" min={10} max={200} className="form-range custom-range" value={weight} onChange={(e) => setWeight(e.target.value)} />
-          <div className="floating-input2 m-auto d-flex align-items-center justify-content-center">
-            <input type="text" min={10} max={200} className="mt-2 text-center" value={weight} onChange={(e) => setWeight(Math.max(10, Math.min(200, Number(e.target.value))))} />
-            <span className="fw-bold mt-2">kg</span>
-          </div>
-          <div className="progress custom-progress mt-2">
-            <div className="progress-bar custom-progress-bar bg-danger" style={{ width: `${(weight / 200) * 100}%` }}>
-              {weight} kg
-            </div>
-          </div>
-        </div> */}
 
         <button className="btn btn-danger mt-3 px-4 py-2 fw-bold" onClick={handleSubmit}>
           Submit Data
@@ -162,11 +148,13 @@ const BmiForm = () => {
             </div>
           </div>
         ) : data ? (
-          <BmiResult data={data} setBmi={setBmi} setCategory={setCategory} />
+          <>
+            <BmiResult data={data} setBmi={setBmi} setCategory={setCategory} />
+            <BmiHistory />
+          </>
         ) : (
           <p className="mt-3 opacity-50">Hasil perhitungan akan muncul di sini</p>
         )}
-        <BmiHistory />
       </div>
     </div>
   );

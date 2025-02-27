@@ -23,7 +23,7 @@ const BmiResult = ({ data }) => {
     if (bmiResult < 18.5) {
       kategori = "Underweight";
       notif = "Utamakan hidup sehat dan perhatikan konsumsi harian";
-      bmiPos = ((bmiResult - 1.1) / (18.5 - 1.1)) * 23.6;
+      bmiPos = ((bmiResult - 1.1) / (18.5 - 1.1)) * 25.6;
     } else if (bmiResult < 24.9) {
       kategori = "Normal";
       notif = "Diet yang baik dapat mempertahankan kesehatan & imun, Pertahankan asupan kalori sesuai dengan kebutuhan kalori harian & konsumsi makanan sehat";
@@ -35,7 +35,7 @@ const BmiResult = ({ data }) => {
     } else {
       kategori = "Obese";
       notif = "Dalam 60% kasus, pola makan yang buruk dapat berisiko Diabetes";
-      bmiPos = 59.4 + ((bmiResult - 29.9) / (200 - 29.9)) * 40.6;
+      bmiPos = 59.4 + ((bmiResult - 29.9) / (300 - 29.9)) * 40.6;
     }
 
     setCategory(kategori);
@@ -70,7 +70,7 @@ const BmiResult = ({ data }) => {
 
       <div className="bmi-progress-container">
         <div className="progress bmi-progress">
-          <div className="progress-bar bg-danger" style={{ width: "23.6%" }}></div>
+          <div className="progress-bar bg-danger" style={{ width: "25.6%" }}></div>
           <div className="progress-bar bg-success" style={{ width: "19.2%" }}></div>
           <div className="progress-bar bg-warning" style={{ width: "16.6%" }}></div>
           <div className="progress-bar bg-danger" style={{ width: "40.6%" }}></div>
